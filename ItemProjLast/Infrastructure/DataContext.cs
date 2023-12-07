@@ -6,10 +6,7 @@ namespace Infrastructure
     {
         public DbSet<Item> Items { get; set; }
         public DataContext(DbContextOptions<DataContext> options):base(options) 
-        {
-            
+        {   
         }
-
-
     }
 }
