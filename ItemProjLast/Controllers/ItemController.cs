@@ -24,21 +24,14 @@ namespace Controllers
             var EntityResoult = _itemRepository.GetAll();
             return EntityResoult.ToList();
         }
-
-
-    
-
-
+        
         [HttpGet]
         [Route("{id}")]
         public async ValueTask<Item?> GetById(int id)
         {
             var EntityReolt = await _itemRepository.GetByIdAsync(id);
             return EntityReolt;
-
         }
-
-
 
         [HttpPost()]
         [Route("Add")]
@@ -76,6 +69,5 @@ namespace Controllers
             var EntityResoult = await _itemRepository.DeleteAsync(id);
             return EntityResoult;
         }
-
     }
 }
