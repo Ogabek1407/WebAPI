@@ -23,9 +23,7 @@ namespace Repository
         public async ValueTask<T> CreateAsync(T entity)
         {
             var result = await GetAll().AddAsync(entity);
-
             await _context.SaveChangesAsync();
-
             return result.Entity;
         }
 
@@ -33,7 +31,6 @@ namespace Repository
         {
             var result = GetAll().Update(entity);
             await this._context.SaveChangesAsync();
-
             return result.Entity;
         }
 
