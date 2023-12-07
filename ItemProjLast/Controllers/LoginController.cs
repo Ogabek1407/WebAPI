@@ -12,17 +12,16 @@ namespace ItemProjLast.Controllers
     [Controller]
     public class LoginController:ControllerBase
     {
-
         public LoginController(IOptions<AppSettings> appSettings)
         {
             AppSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
             securityTokenHandler = new JwtSecurityTokenHandler();
         }
-
+        
         public IOptions<AppSettings> AppSettings { get; }
 
         private JwtSecurityTokenHandler securityTokenHandler;
-
+        
         [AllowAnonymous]
         [HttpPost]
         [Route("Token")]
@@ -35,7 +34,6 @@ namespace ItemProjLast.Controllers
             string Token="";
             if (loginDto.Password==302 && loginDto.Login == "Space")
             {
-               
                 var key = Encoding.ASCII.GetBytes(AppSettings.Value.SecretKey);
                 var TokenDescriptior = new SecurityTokenDescriptor()
                 {
@@ -57,13 +55,6 @@ namespace ItemProjLast.Controllers
                 return BadRequest("Error");
             }
             return Ok(Token);
-            
-
-
+            }
         }
-
-            
-
-
-    }
 }
