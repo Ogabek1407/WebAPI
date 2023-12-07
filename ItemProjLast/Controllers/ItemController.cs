@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Controllers
 {
     [ApiController]
-    
+    [Authorize]
     public class ItemController : ControllerBase
     {
         public ItemRepository _itemRepository { get; }
@@ -19,46 +19,19 @@ namespace Controllers
 
         [HttpGet]
         [Route("GetAll")]
-        public async ValueTask<List<ItemDto>> GetAll()
+        public async ValueTask<List<Item>> GetAll()
         {
-            var data = _itemRepository.GetAll();
-            var EntityResoult = new List<ItemDto>();
-            ItemDto entity;
-            foreach (var item in data)
-            {
-                entity = new ItemDto()
-                {
-                    Name = item.Name,
-                    Time = item.Time,
-                    Type = item.Type
-                };
-                EntityResoult.Add(entity);
-            }
-
-            return EntityResoult;
+            var EntityResoult = _itemRepository.GetAll();
+            return EntityResoult.ToList();
         }
 
 
-        [HttpGet]
-        [Route("GetAllId")]
-        public async ValueTask<List<int>> GetAllId()
-        {
-            var data = _itemRepository.GetAll().ToList();
-            var entityResoult = new List<int>();
-            ItemDto entity;
-            foreach (var item in data)
-            {
-                
-                entityResoult.Add(item.Id);
-            }
-
-            return entityResoult;
-        }
+    
 
 
         [HttpGet]
         [Route("{id}")]
-        public async ValueTask<Item> GetById(int id)
+        public async ValueTask<Item?> GetById(int id)
         {
             var EntityReolt = await _itemRepository.GetByIdAsync(id);
             return EntityReolt;
@@ -84,22 +57,13 @@ namespace Controllers
                 Type = data2.Type,
                 Time = data2.Time
             };
-
             return entityResoult;
         }
 
         [HttpPut]
-        [Route("{id}")]
-        public async ValueTask<Item> UpdateAsync(int id, ItemDto item)
+        [Route("")]
+        public async ValueTask<Item?> UpdateAsync(Item data)
         {
-            var data = new Item()
-            {
-                Name = item.Name,
-                Id = id,
-                Time = item.Time,
-                Type = item.Type
-            };
-
             var EntityResoult = await _itemRepository.UpdateAsyc(data);
             return EntityResoult;
 
@@ -107,7 +71,7 @@ namespace Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public async ValueTask<Item> DeleteAsync(int id)
+        public async ValueTask<Item?> DeleteAsync(int id)
         {
             var EntityResoult = await _itemRepository.DeleteAsync(id);
             return EntityResoult;
