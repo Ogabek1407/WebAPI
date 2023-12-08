@@ -33,7 +33,7 @@ namespace Repository
 
         public async ValueTask<Item?> UpdateAsync(Item entity)
         {
-            if (await GetById(entity.ItemId) is  null)
+            if (entity is  null)
                 new ArgumentNullException(nameof(entity));
             var entityResould = GetAll().Update(entity);
             await _context.SaveChangesAsync();
@@ -42,9 +42,10 @@ namespace Repository
 
         public async ValueTask<Item?> DeleteAsync(int id)
         {
-            if (await GetById(id) is null)
+            var entity =await GetAll().Where(x => x.ItemId == id).FirstOrDefaultAsync();
+            if (entity is null)
                 new ArgumentNullException(nameof(id));
-            var entityResoult = GetAll().Remove(await GetById(id));
+            var entityResoult = GetAll().Remove(entity);
             await _context.SaveChangesAsync();
             return entityResoult.Entity;
 

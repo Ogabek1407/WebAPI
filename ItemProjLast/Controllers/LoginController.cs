@@ -12,13 +12,13 @@ namespace ItemProjLast.Controllers
     [Controller]
     public class LoginController:ControllerBase
     {
-        public LoginController(IOptions<AppSettings> appSettings)
+        public LoginController(IOptions<AppSettingsDto> appSettings)
         {
             AppSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
             securityTokenHandler = new JwtSecurityTokenHandler();
         }
         
-        public IOptions<AppSettings> AppSettings { get; }
+        public IOptions<AppSettingsDto> AppSettings { get; }
 
         private JwtSecurityTokenHandler securityTokenHandler;
         

@@ -6,6 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Repository;
 using System.Text;
+using Interface;
+using ItemProjLast.Repository;
+using Models;
+
 namespace ItemProjLast
 {
     public class Program
@@ -16,9 +20,8 @@ namespace ItemProjLast
 
 
             IConfigurationSection configuration = builder.Configuration.GetSection("AppSettings");
-            builder.Services.Configure<AppSettings>(configuration);
-            AppSettings appSettings = configuration.Get<AppSettings>();
-            var secretKey = Encoding.ASCII.GetBytes(appSettings.SecretKey);
+            AppSettingsDto appSettingsDto = configuration.Get<AppSettingsDto>();
+            var secretKey = Encoding.ASCII.GetBytes(appSettingsDto.SecretKey);
 
             builder.Services.AddAuthentication(x =>
             {
@@ -38,7 +41,9 @@ namespace ItemProjLast
             });
 
             builder.Services.AddControllers();
-            builder.Services.AddScoped<ItemRepository>();
+            builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
+            builder.Services.AddScoped<IItemRepository,ItemRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
             builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
 
