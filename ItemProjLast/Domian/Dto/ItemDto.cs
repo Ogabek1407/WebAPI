@@ -2,8 +2,8 @@
 {
     public class ItemDto
     {
-        public int Type { get; set; }
-        public string Name { get; set; }
-        public DateTime Time { get; set; }
+        public int ItemType { get; set; }
+        public string ItemName { get; set; }
+        public DateTime ItemDate { get; set; }
     }
 }

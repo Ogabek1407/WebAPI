@@ -1,4 +1,5 @@
-using ItemProjLast.Domian.Enums;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Models;
 
@@ -6,10 +7,9 @@ public class User
 {
     public int Id { get; set; }
     public string FirstName { get; set; }
-    public string Gmail { get; set; }
+    [Required]
+    public string Email { get; set; }
     public string LastName { get; set; }
-    public int Age { get; set; }
-    public Role Role { get; set; }
-    public string Login { get; set; }
+    [MinLength(8)]
     public string Password { get; set; }
 }

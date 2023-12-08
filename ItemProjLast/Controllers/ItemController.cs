@@ -1,8 +1,8 @@
-﻿using Repository;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Models;
 using Dto;
 using Microsoft.AspNetCore.Authorization;
+using Interface;
 
 namespace Controllers
 {
@@ -10,74 +10,86 @@ namespace Controllers
     [Authorize]
     public class ItemController : ControllerBase
     {
-        public ItemRepository ItemRepository { get; }
+        public IItemRepository ItemRepository { get; }
 
-        public ItemController(ItemRepository itemRepository)
+        public ItemController(IItemRepository itemRepository)
         {
             ItemRepository = itemRepository;
         }
 
         [HttpGet]
         [Route("GetAll")]
-        public async ValueTask<ActionResult<List<Item>>> GetAll()
+        public async ValueTask<List<Item>> GetAll()
         {
             var EntityResoult = ItemRepository.GetAll();
-            return Ok(EntityResoult.ToList());
+            return EntityResoult.ToList();
         }
         
         [HttpGet]
         [Route("{id}")]
-        public async Task<OkObjectResult> GetById(int id)
+        public async Task<ActionResult<Item>> GetById(int id)
         {
             var EntityResoult = await ItemRepository.GetById(id);
             if (EntityResoult is null)
-                NotFound(nameof(EntityResoult));
+                return NotFound(nameof(EntityResoult));
             return Ok(EntityResoult);
         }
 
         [HttpPost()]
         [Route("Add")]
-        public async ValueTask<ActionResult<ItemDto>> CreateAsync(ItemDto itemDto)
+        public async ValueTask<ActionResult<Item>> CreateAsync(Item item)
         {
-            if (itemDto is null)
-                new ArgumentNullException(nameof(itemDto));
-            var data = new Item()
+            try
             {
-                ItemName = itemDto.Name,
-                ItemDate = itemDto.Time,
-                ItemType = itemDto.Type
-            };
-            var data2 = await ItemRepository.CreateAsync(data);
-            if (data2 is null)
-                new ArgumentNullException(nameof(data2));
-            var entityResoult = new ItemDto()
+                if (item is null)
+                    new ArgumentNullException("obect is null");
+
+                var entityResoult = await ItemRepository.CreateAsync(item);
+                if (entityResoult is null)
+                    throw new ArgumentNullException();
+                return entityResoult;
+            }
+            catch (Exception)
             {
-                Name = data2.ItemName,
-                Type = data2.ItemType,
-                Time = data2.ItemDate
-            };
-            return entityResoult;
+                return BadRequest("bad object");
+            }
         }
 
         [HttpPut]
         [Route("Update")]
-        public async ValueTask<Item?> UpdateAsync(Item data)
+        public async ValueTask<ActionResult<Item?>> UpdateAsync(Item data)
         {
-            if (data is null)
-                new ArgumentNullException(nameof(data));
-            var EntityResoult = await ItemRepository.UpdateAsync(data);
-            return EntityResoult;
+            try
+            {
+                if (data is null)
+                    throw new ArgumentNullException(nameof(data));
+                var EntityResoult = await ItemRepository.UpdateAsync(data);
+                if (EntityResoult is null)
+                    BadRequest(nameof(EntityResoult));
+                return EntityResoult;
+            }
+            catch (Exception)
+            {
+                return BadRequest("not fount");
+            }
 
         }
 
         [HttpDelete]
         [Route("Delete")]
-        public async ValueTask<Item?> DeleteAsync(int id)
+        public async ValueTask<ActionResult<Item?>> DeleteAsync(int id)
         {
-            var EntityResoult = await ItemRepository.DeleteAsync(id);
-            if (EntityResoult is null)
-                new ArgumentNullException(nameof(EntityResoult));
-            return EntityResoult;
+            try
+            {
+                var EntityResoult = await ItemRepository.DeleteAsync(id);
+                if (EntityResoult is null)
+                    throw new ArgumentNullException(nameof(EntityResoult));
+                return EntityResoult;
+            }
+            catch (Exception)
+            {
+                return BadRequest("not fount");
+            }
         }
     }
 }

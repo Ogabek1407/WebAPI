@@ -1,6 +1,9 @@
-﻿using ItemProjLast.Domian.Dto;
+﻿using Interface;
+using ItemProjLast.Domian.Dto;
+using ItemProjLast.Domian.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,13 +15,15 @@ namespace ItemProjLast.Controllers
     [Controller]
     public class LoginController:ControllerBase
     {
-        public LoginController(IOptions<AppSettingsDto> appSettings)
+        public LoginController(IOptions<AppSettings> appSettings,IUserRepository userRepository)
         {
             AppSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
+            UserRepository = userRepository;
             securityTokenHandler = new JwtSecurityTokenHandler();
         }
         
-        public IOptions<AppSettingsDto> AppSettings { get; }
+        public IOptions<AppSettings> AppSettings { get; }
+        public IUserRepository UserRepository { get; }
 
         private JwtSecurityTokenHandler securityTokenHandler;
         
@@ -29,10 +34,16 @@ namespace ItemProjLast.Controllers
         {
             if(loginDto == null)
             {
-                return BadRequest("not fount");
+                return BadRequest("argument null");
             }
             string Token="";
-            if (loginDto.Password==302 && loginDto.Login == "Space")
+            var user = await UserRepository.
+                GetAll().
+                Where(x =>
+                x.Email == loginDto.Email &&
+                x.Password == loginDto.Password).FirstOrDefaultAsync();
+          
+            if (user is not null)
             {
                 var key = Encoding.ASCII.GetBytes(AppSettings.Value.SecretKey);
                 var TokenDescriptior = new SecurityTokenDescriptor()
@@ -40,9 +51,9 @@ namespace ItemProjLast.Controllers
                     Subject = new ClaimsIdentity(
                         new Claim[]
                         {
-                            new Claim(ClaimTypes.GivenName,"Space"),
-                            new Claim(ClaimTypes.Name,"302"),
-                            new Claim(ClaimTypes.Role,"Elbek7")
+                            new(ClaimTypes.GivenName,user.FirstName),
+                            new(ClaimTypes.Name,user.LastName),
+                            new(ClaimTypes.SerialNumber,user.Email.ToString())
                         }),
                     Expires = DateTime.UtcNow.AddDays(2),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
@@ -52,7 +63,7 @@ namespace ItemProjLast.Controllers
             }
             if (string.IsNullOrEmpty(Token))
             {
-                return BadRequest("Error");
+                return BadRequest("not found");
             }
             return Ok(Token);
             }

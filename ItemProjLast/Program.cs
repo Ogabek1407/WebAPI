@@ -1,5 +1,4 @@
 using Infrastructure;
-using ItemProjLast.Domian.Dto;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -7,8 +6,8 @@ using Microsoft.OpenApi.Models;
 using Repository;
 using System.Text;
 using Interface;
-using ItemProjLast.Repository;
 using Models;
+using ItemProjLast.Domian.Models;
 
 namespace ItemProjLast
 {
@@ -20,7 +19,7 @@ namespace ItemProjLast
 
 
             IConfigurationSection configuration = builder.Configuration.GetSection("AppSettings");
-            AppSettingsDto appSettingsDto = configuration.Get<AppSettingsDto>();
+            AppSettings appSettingsDto = configuration.Get<AppSettings>();
             var secretKey = Encoding.ASCII.GetBytes(appSettingsDto.SecretKey);
 
             builder.Services.AddAuthentication(x =>
@@ -40,10 +39,14 @@ namespace ItemProjLast
                 };
             });
 
-            builder.Services.AddControllers();
-            builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
-            builder.Services.AddScoped<IItemRepository,ItemRepository>();
+            IConfigurationSection App = builder.Configuration.GetSection("AppSettings");
+            builder.Services.Configure<AppSettings>(App);
+            AppSettings appSettings = configuration.Get<AppSettings>();
+
+
+            builder.Services.AddScoped<IItemRepository, ItemRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddControllers();
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
             builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
 

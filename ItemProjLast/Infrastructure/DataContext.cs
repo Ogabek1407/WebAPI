@@ -1,4 +1,4 @@
-﻿using ItemProjLast.Domian.Dto;
+﻿using ItemProjLast.Domian.Models;
 using Microsoft.EntityFrameworkCore;
 using Models;
 namespace Infrastructure
@@ -7,7 +7,7 @@ namespace Infrastructure
     {
         public DbSet<Item> Items { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<AppSettingsDto> AppSettings { get; set; }
+        public DbSet<AppSettings> AppSettingss { get; set; }
         public DataContext(DbContextOptions<DataContext> options):base(options) 
         {   
         }

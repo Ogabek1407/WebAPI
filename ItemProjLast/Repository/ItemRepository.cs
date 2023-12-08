@@ -25,7 +25,7 @@ namespace Repository
         public async ValueTask<Item?> CreateAsync(Item entity)
         {
             if (entity is null)
-                new ArgumentNullException(nameof(entity));
+                throw new ArgumentNullException(nameof(entity));
             var entityResoult =await GetAll().AddAsync(entity);
             await _context.SaveChangesAsync();
             return entityResoult.Entity;
@@ -34,17 +34,22 @@ namespace Repository
         public async ValueTask<Item?> UpdateAsync(Item entity)
         {
             if (entity is  null)
-                new ArgumentNullException(nameof(entity));
-            var entityResould = GetAll().Update(entity);
+                throw new ArgumentNullException(nameof(entity));
+            var entityResould =await GetAll().Where(x => x.ItemId == entity.ItemId).FirstOrDefaultAsync();
+            if(entityResould is null)
+                throw new Exception(nameof(entityResould));
+            entityResould.ItemName = entity.ItemName;
+            entityResould.ItemType = entity.ItemType;
+            entityResould.ItemDate= entity.ItemDate;
             await _context.SaveChangesAsync();
-            return entityResould.Entity;
+            return entityResould;
         }
 
         public async ValueTask<Item?> DeleteAsync(int id)
         {
             var entity =await GetAll().Where(x => x.ItemId == id).FirstOrDefaultAsync();
             if (entity is null)
-                new ArgumentNullException(nameof(id));
+                throw new ArgumentNullException(nameof(id));
             var entityResoult = GetAll().Remove(entity);
             await _context.SaveChangesAsync();
             return entityResoult.Entity;
