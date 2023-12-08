@@ -2,9 +2,9 @@
 {
     public class Item
     {
-        public int Id { get; set; }
-        public int Type { get; set; }
-        public DateTime Time { get; set; }
-        public string Name { get; set; }
+        public int ItemId { get; set; }
+        public int ItemType { get; set; }
+        public DateTime ItemDate { get; set; }
+        public string ItemName { get; set; }
     }
 }
